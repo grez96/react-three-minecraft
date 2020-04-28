@@ -1,24 +1,23 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { Canvas } from "react-three-fiber";
+
+import "./App.css";
+
+import Camera from "./components/Camera";
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Canvas>
+        <Camera position={[0, 0, 5]} />
+
+        <ambientLight />
+
+        <mesh position={[0, 0, 0]}>
+          <boxBufferGeometry attach="geometry" args={[1, 1, 1]} />
+          <meshStandardMaterial attach="material" color={"blue"} />
+        </mesh>
+      </Canvas>
     </div>
   );
 }
