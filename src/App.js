@@ -1,22 +1,22 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { Canvas } from "react-three-fiber";
 
 import "./App.css";
 
 import Camera from "./components/Camera";
+import Cube from "./components/Cube";
 
 function App() {
   return (
     <div className="App">
       <Canvas>
-        <Camera position={[0, 0, 5]} />
+        <Camera location={[-3, 2, 5]} rotation={[-25, -25, 0]} />
 
         <ambientLight />
 
-        <mesh position={[0, 0, 0]}>
-          <boxBufferGeometry attach="geometry" args={[1, 1, 1]} />
-          <meshStandardMaterial attach="material" color={"blue"} />
-        </mesh>
+        <Suspense fallback={null}>
+          <Cube />
+        </Suspense>
       </Canvas>
     </div>
   );
