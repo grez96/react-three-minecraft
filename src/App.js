@@ -26,7 +26,10 @@ function App() {
 
   return (
     <div className="App">
-      <KeyboardControllerDOM onActiveKeysChange={onActiveKeysChange} />
+      <KeyboardControllerDOM
+        className="KeyboardControllerDOM"
+        onActiveKeysChange={onActiveKeysChange}
+      />
 
       <Canvas>
         <Provider store={store}>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 
 export const SUPPORTED_KEYS = {
@@ -8,8 +8,14 @@ export const SUPPORTED_KEYS = {
   down: "ArrowDown",
 };
 
-function KeyboardControllerDOM({ onActiveKeysChange }) {
+function KeyboardControllerDOM({ className, onActiveKeysChange }) {
+  const inputRef = useRef();
+
   const [activeKeys, setActiveKeys] = useState([]);
+
+  useEffect(() => {
+    inputRef.current && inputRef.current.focus();
+  }, []);
 
   useEffect(() => {
     onActiveKeysChange(activeKeys);
@@ -17,9 +23,13 @@ function KeyboardControllerDOM({ onActiveKeysChange }) {
 
   return (
     <input
-      autoFocus
+      className={className}
+      ref={inputRef}
+      autoFocus={true}
       onBlur={(e) => {
-        e.currentTarget.focus();
+        setTimeout(() => {
+          inputRef.current.focus();
+        });
       }}
       onChange={(e) => {
         e.target.value = "";
@@ -42,6 +52,7 @@ function KeyboardControllerDOM({ onActiveKeysChange }) {
 }
 
 KeyboardControllerDOM.propTypes = {
+  className: PropTypes.string,
   onActiveKeysChange: PropTypes.func,
 };
 
