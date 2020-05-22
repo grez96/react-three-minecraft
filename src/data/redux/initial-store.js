@@ -1,5 +1,5 @@
 const initialStore = {
-  message: "Hello Redux!",
+  activeKeys: [],
 };
 
 export default initialStore;

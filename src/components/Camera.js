@@ -1,26 +1,45 @@
-import React, { useRef, useEffect } from "react";
-import { useThree } from "react-three-fiber";
+import React, { useRef, useEffect, useState } from "react";
+import { useThree, useFrame } from "react-three-fiber";
 import PropTypes from "prop-types";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 import { degreesToRadians } from "../utils/math";
-import { updateMessage } from "../data/redux/actions";
+import { SUPPORTED_KEYS } from "./KeyboardControllerDOM";
 
-function Camera({ location, rotation }) {
-  const dispatch = useDispatch();
-  const message = useSelector((state) => state.message);
+const movementSpeed = 1;
+
+function Camera({ initialLocation, rotation }) {
+  const activeKeys = useSelector((state) => state.activeKeys);
 
   const { setDefaultCamera } = useThree();
 
   const ref = useRef();
 
+  const [location, setLocation] = useState(initialLocation);
+
   useEffect(() => setDefaultCamera(ref.current), [setDefaultCamera]);
-  useEffect(() => {
-    dispatch(updateMessage("Bye Redux!"));
-  }, [dispatch]);
-  useEffect(() => {
-    console.log(message);
-  }, [message]);
+  useFrame((state, delta) => {
+    let [x, y, z] = location;
+
+    activeKeys.forEach((key) => {
+      switch (key) {
+        case SUPPORTED_KEYS.left:
+          x -= movementSpeed * delta;
+          break;
+        case SUPPORTED_KEYS.up:
+          z -= movementSpeed * delta;
+          break;
+        case SUPPORTED_KEYS.right:
+          x += movementSpeed * delta;
+          break;
+        case SUPPORTED_KEYS.down:
+          z += movementSpeed * delta;
+          break;
+        default:
+      }
+      setLocation([x, y, z]);
+    });
+  });
 
   return (
     <perspectiveCamera
@@ -34,7 +53,7 @@ function Camera({ location, rotation }) {
 }
 
 Camera.propTypes = {
-  location: PropTypes.array,
+  initialLocation: PropTypes.array,
   rotation: PropTypes.array,
 };
 

@@ -1,5 +1,5 @@
 const keys = {
-  UPDATE_MESSAGE: "UPDATE_MESSAGE",
+  UPDATE_ACTIVE_KEYS: "UPDATE_ACTIVE_KEYS",
 };
 
 export default keys;

@@ -1,8 +1,8 @@
 import keys from "./keys";
 
-export function updateMessage(value) {
+export function updateActiveKeys(value) {
   return {
-    type: keys.UPDATE_MESSAGE,
+    type: keys.UPDATE_ACTIVE_KEYS,
     value,
   };
 }
