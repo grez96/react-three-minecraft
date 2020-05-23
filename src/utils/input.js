@@ -38,3 +38,24 @@ export function useKeyboard() {
 
   return activeKeysRef;
 }
+
+export function useMouse() {
+  const mouseRef = useRef({ position: { normalizedX: 0, normalizedY: 0 } });
+
+  useEffect(() => {
+    const onMouseMove = (e) => {
+      mouseRef.current.position = {
+        normalizedX: e.offsetX / window.innerWidth,
+        normalizedY: e.offsetY / window.innerHeight,
+      };
+    };
+
+    window.addEventListener("mousemove", onMouseMove);
+
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+    };
+  }, []);
+
+  return mouseRef;
+}

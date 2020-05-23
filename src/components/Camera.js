@@ -3,23 +3,26 @@ import { useThree, useFrame } from "react-three-fiber";
 import PropTypes from "prop-types";
 
 import { degreesToRadians } from "../utils/math";
-import { useKeyboard, SUPPORTED_KEYS } from "../utils/input";
+import { useKeyboard, useMouse, SUPPORTED_KEYS } from "../utils/input";
 
 const movementSpeed = 1;
+const rotationSpeed = 40;
 
-function Camera({ initialLocation, rotation }) {
+function Camera({ initialLocation, initialRotation }) {
   const { setDefaultCamera } = useThree();
 
   const cameraRef = useRef();
   const activeKeysRef = useKeyboard();
+  const mouseRef = useMouse();
 
   const [location, setLocation] = useState(initialLocation);
+  const [rotation, setRotation] = useState(initialRotation);
+  const [previousMousePosition, setPreviousMousePosition] = useState({});
 
   useEffect(() => setDefaultCamera(cameraRef.current), [setDefaultCamera]);
 
   useFrame((state, delta) => {
     let [x, y, z] = location;
-
     activeKeysRef.current.forEach((key) => {
       switch (key) {
         case SUPPORTED_KEYS.left:
@@ -38,6 +41,22 @@ function Camera({ initialLocation, rotation }) {
       }
       setLocation([x, y, z]);
     });
+
+    let [pitch, roll, yaw] = rotation;
+    const MOVEMENT_THRESHOLD = 0.01;
+    const mouseYDifference =
+      (previousMousePosition.y === undefined ? 0 : previousMousePosition.y) -
+      mouseRef.current.position.normalizedY;
+    if (
+      previousMousePosition.y === undefined ||
+      Math.abs(mouseYDifference) > MOVEMENT_THRESHOLD
+    ) {
+      pitch += mouseYDifference * rotationSpeed;
+      setPreviousMousePosition({
+        y: mouseRef.current.position.normalizedY,
+      });
+      setRotation([pitch, roll, yaw]);
+    }
   });
 
   return (
