@@ -1,27 +1,26 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useThree, useFrame } from "react-three-fiber";
 import PropTypes from "prop-types";
-import { useSelector } from "react-redux";
 
 import { degreesToRadians } from "../utils/math";
-import { SUPPORTED_KEYS } from "./KeyboardControllerDOM";
+import { useKeyboard, SUPPORTED_KEYS } from "../utils/input";
 
 const movementSpeed = 1;
 
 function Camera({ initialLocation, rotation }) {
-  const activeKeys = useSelector((state) => state.activeKeys);
-
   const { setDefaultCamera } = useThree();
 
-  const ref = useRef();
+  const cameraRef = useRef();
+  const activeKeysRef = useKeyboard();
 
   const [location, setLocation] = useState(initialLocation);
 
-  useEffect(() => setDefaultCamera(ref.current), [setDefaultCamera]);
+  useEffect(() => setDefaultCamera(cameraRef.current), [setDefaultCamera]);
+
   useFrame((state, delta) => {
     let [x, y, z] = location;
 
-    activeKeys.forEach((key) => {
+    activeKeysRef.current.forEach((key) => {
       switch (key) {
         case SUPPORTED_KEYS.left:
           x -= movementSpeed * delta;
@@ -45,7 +44,7 @@ function Camera({ initialLocation, rotation }) {
     <perspectiveCamera
       near={0.1}
       far={1000}
-      ref={ref}
+      ref={cameraRef}
       position={location}
       rotation={rotation.map((axisDegrees) => degreesToRadians(axisDegrees))}
     />
