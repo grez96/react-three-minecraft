@@ -1,4 +1,10 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, {
+  useRef,
+  useEffect,
+  useState,
+  useCallback,
+  useReducer,
+} from "react";
 import { useThree, useFrame } from "react-three-fiber";
 import PropTypes from "prop-types";
 
@@ -6,15 +12,13 @@ import { degreesToRadians } from "../utils/math";
 import { useKeyboard, useLockedMouse, SUPPORTED_KEYS } from "../utils/input";
 
 const movementSpeed = 1;
-const rotationSpeed = 25;
+const rotationSpeed = 0.05;
 
 function Camera({ initialLocation, initialRotation }) {
   const { setDefaultCamera } = useThree();
   const cameraRef = useRef();
   useEffect(() => setDefaultCamera(cameraRef.current), [setDefaultCamera]);
 
-  const [rotation, setRotation] = useState(initialRotation);
-  const mouseMoveRef = useLockedMouse();
   const [location, setLocation] = useState(initialLocation);
   const activeKeysRef = useKeyboard();
   useFrame((state, delta) => {
@@ -37,12 +41,18 @@ function Camera({ initialLocation, initialRotation }) {
       }
       setLocation([x, y, z]);
     });
-
-    let [pitch, yaw, roll] = rotation;
-    pitch += (mouseMoveRef.current.y ?? 0) * -1 * rotationSpeed * delta;
-    yaw += (mouseMoveRef.current.x ?? 0) * -1 * rotationSpeed * delta;
-    setRotation([pitch, yaw, roll]);
   });
+
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
+  const rotationRef = useRef(initialRotation);
+  const onMouseChange = useCallback((x, y) => {
+    let [pitch, yaw, roll] = rotationRef.current;
+    pitch += y * -1 * rotationSpeed;
+    yaw += x * -1 * rotationSpeed;
+    rotationRef.current = [pitch, yaw, roll];
+    forceUpdate();
+  }, []);
+  useLockedMouse(onMouseChange);
 
   return (
     <perspectiveCamera
@@ -50,7 +60,9 @@ function Camera({ initialLocation, initialRotation }) {
       far={1000}
       ref={cameraRef}
       position={location}
-      rotation={rotation?.map((axisDegrees) => degreesToRadians(axisDegrees))}
+      rotation={rotationRef.current?.map((axisDegrees) =>
+        degreesToRadians(axisDegrees)
+      )}
     />
   );
 }

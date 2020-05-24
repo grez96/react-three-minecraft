@@ -39,9 +39,7 @@ export function useKeyboard() {
   return activeKeysRef;
 }
 
-export function useLockedMouse() {
-  const mouseMoveRef = useRef({});
-
+export function useLockedMouse(onMouseChange = () => {}) {
   useEffect(() => {
     let lockedElement = document.body;
 
@@ -58,8 +56,7 @@ export function useLockedMouse() {
       }
     };
     let onMouseMove = (e) => {
-      mouseMoveRef.current = { x: e.movementX, y: e.movementY };
-      console.log(mouseMoveRef.current);
+      onMouseChange(e.movementX, e.movementY);
     };
     document.addEventListener("pointerlockchange", onLockChange);
 
@@ -69,7 +66,5 @@ export function useLockedMouse() {
       document.removeEventListener("pointerlockchange", onLockChange);
       document.removeEventListener("mousemove", onMouseMove);
     };
-  }, []);
-
-  return mouseMoveRef;
+  }, [onMouseChange]);
 }

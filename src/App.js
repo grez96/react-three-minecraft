@@ -17,7 +17,7 @@ function App() {
     <div className="App">
       <Canvas>
         <Provider store={store}>
-          <Camera initialLocation={[0, 2, 5]} initialRotation={[0, 0, 0]} />
+          <Camera initialLocation={[0, 1, 5]} initialRotation={[0, 0, 0]} />
 
           <ambientLight />
 
