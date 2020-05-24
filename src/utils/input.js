@@ -34,28 +34,42 @@ export function useKeyboard() {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keydown", onKeyUp);
     };
-  }, [activeKeysRef]);
+  }, []);
 
   return activeKeysRef;
 }
 
-export function useMouse() {
-  const mouseRef = useRef({ position: { normalizedX: 0, normalizedY: 0 } });
+export function useLockedMouse() {
+  const mouseMoveRef = useRef({});
 
   useEffect(() => {
-    const onMouseMove = (e) => {
-      mouseRef.current.position = {
-        normalizedX: e.offsetX / window.innerWidth,
-        normalizedY: e.offsetY / window.innerHeight,
-      };
-    };
+    let lockedElement = document.body;
 
-    window.addEventListener("mousemove", onMouseMove);
+    let onClick = () => {
+      lockedElement.requestPointerLock();
+    };
+    lockedElement.addEventListener("click", onClick);
+
+    let onLockChange = () => {
+      if (document.pointerLockElement !== null) {
+        document.addEventListener("mousemove", onMouseMove);
+      } else {
+        document.removeEventListener("mousemove", onMouseMove);
+      }
+    };
+    let onMouseMove = (e) => {
+      mouseMoveRef.current = { x: e.movementX, y: e.movementY };
+      console.log(mouseMoveRef.current);
+    };
+    document.addEventListener("pointerlockchange", onLockChange);
 
     return () => {
-      window.removeEventListener("mousemove", onMouseMove);
+      lockedElement.removeEventListener("click", onClick);
+      document.exitPointerLock();
+      document.removeEventListener("pointerlockchange", onLockChange);
+      document.removeEventListener("mousemove", onMouseMove);
     };
   }, []);
 
-  return mouseRef;
+  return mouseMoveRef;
 }

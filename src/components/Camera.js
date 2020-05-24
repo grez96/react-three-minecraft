@@ -3,24 +3,20 @@ import { useThree, useFrame } from "react-three-fiber";
 import PropTypes from "prop-types";
 
 import { degreesToRadians } from "../utils/math";
-import { useKeyboard, useMouse, SUPPORTED_KEYS } from "../utils/input";
+import { useKeyboard, useLockedMouse, SUPPORTED_KEYS } from "../utils/input";
 
 const movementSpeed = 1;
-const rotationSpeed = 40;
+const rotationSpeed = 25;
 
 function Camera({ initialLocation, initialRotation }) {
   const { setDefaultCamera } = useThree();
-
   const cameraRef = useRef();
-  const activeKeysRef = useKeyboard();
-  const mouseRef = useMouse();
-
-  const [location, setLocation] = useState(initialLocation);
-  const [rotation, setRotation] = useState(initialRotation);
-  const [previousMousePosition, setPreviousMousePosition] = useState({});
-
   useEffect(() => setDefaultCamera(cameraRef.current), [setDefaultCamera]);
 
+  const [rotation, setRotation] = useState(initialRotation);
+  const mouseMoveRef = useLockedMouse();
+  const [location, setLocation] = useState(initialLocation);
+  const activeKeysRef = useKeyboard();
   useFrame((state, delta) => {
     let [x, y, z] = location;
     activeKeysRef.current.forEach((key) => {
@@ -42,21 +38,10 @@ function Camera({ initialLocation, initialRotation }) {
       setLocation([x, y, z]);
     });
 
-    let [pitch, roll, yaw] = rotation;
-    const MOVEMENT_THRESHOLD = 0.01;
-    const mouseYDifference =
-      (previousMousePosition.y === undefined ? 0 : previousMousePosition.y) -
-      mouseRef.current.position.normalizedY;
-    if (
-      previousMousePosition.y === undefined ||
-      Math.abs(mouseYDifference) > MOVEMENT_THRESHOLD
-    ) {
-      pitch += mouseYDifference * rotationSpeed;
-      setPreviousMousePosition({
-        y: mouseRef.current.position.normalizedY,
-      });
-      setRotation([pitch, roll, yaw]);
-    }
+    let [pitch, yaw, roll] = rotation;
+    pitch += (mouseMoveRef.current.y ?? 0) * -1 * rotationSpeed * delta;
+    yaw += (mouseMoveRef.current.x ?? 0) * -1 * rotationSpeed * delta;
+    setRotation([pitch, yaw, roll]);
   });
 
   return (
@@ -65,7 +50,7 @@ function Camera({ initialLocation, initialRotation }) {
       far={1000}
       ref={cameraRef}
       position={location}
-      rotation={rotation.map((axisDegrees) => degreesToRadians(axisDegrees))}
+      rotation={rotation?.map((axisDegrees) => degreesToRadians(axisDegrees))}
     />
   );
 }
