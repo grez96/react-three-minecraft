@@ -1,10 +1,4 @@
-import React, {
-  useRef,
-  useEffect,
-  useState,
-  useCallback,
-  useReducer,
-} from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import { useThree, useFrame } from "react-three-fiber";
 import PropTypes from "prop-types";
 
@@ -43,15 +37,16 @@ function Camera({ initialLocation, initialRotation }) {
     });
   });
 
-  const [, forceUpdate] = useReducer((x) => x + 1, 0);
-  const rotationRef = useRef(initialRotation);
-  const onMouseChange = useCallback((x, y) => {
-    let [pitch, yaw, roll] = rotationRef.current;
-    pitch += y * -1 * rotationSpeed;
-    yaw += x * -1 * rotationSpeed;
-    rotationRef.current = [pitch, yaw, roll];
-    forceUpdate();
-  }, []);
+  const [rotation, setRotation] = useState(initialRotation);
+  const onMouseChange = useCallback(
+    (x, y) => {
+      let [pitch, yaw, roll] = rotation;
+      pitch += y * -1 * rotationSpeed;
+      yaw += x * -1 * rotationSpeed;
+      setRotation([pitch, yaw, roll]);
+    },
+    [rotation, setRotation]
+  );
   useLockedMouse(onMouseChange);
 
   return (
@@ -60,9 +55,7 @@ function Camera({ initialLocation, initialRotation }) {
       far={1000}
       ref={cameraRef}
       position={location}
-      rotation={rotationRef.current?.map((axisDegrees) =>
-        degreesToRadians(axisDegrees)
-      )}
+      rotation={rotation?.map((axisDegrees) => degreesToRadians(axisDegrees))}
     />
   );
 }
