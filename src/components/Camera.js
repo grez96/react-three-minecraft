@@ -38,15 +38,12 @@ function Camera({ initialLocation, initialRotation }) {
   });
 
   const [rotation, setRotation] = useState(initialRotation);
-  const onMouseChange = useCallback(
-    (x, y) => {
-      let [pitch, yaw, roll] = rotation;
-      pitch += y * -1 * rotationSpeed;
-      yaw += x * -1 * rotationSpeed;
-      setRotation([pitch, yaw, roll]);
-    },
-    [rotation, setRotation]
-  );
+  const onMouseChange = useCallback((x, y) => {
+    let [pitch, yaw, roll] = rotation;
+    pitch += y * -1 * rotationSpeed;
+    yaw += x * -1 * rotationSpeed;
+    setRotation([pitch, yaw, roll]);
+  }, []);
   useLockedMouse(onMouseChange);
 
   return (
